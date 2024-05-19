@@ -2,10 +2,12 @@
 import { VNetworkGraph, defineConfigs, GridLayout, type ViewConfig, SimpleLayout, type Instance, type EventHandlers } from 'v-network-graph'
 import type { RecursivePartial } from 'v-network-graph/lib/common/common.js'
 import { useFpStore } from '@/stores/fp'
-import { useRoutersStore } from '~/stores/routers'
+import { useRoutersStore } from '@/stores/routers'
+import { useTopologyStore } from '@/stores/topology'
 
 const fpStore = useFpStore()
 const routerStore = useRoutersStore()
+const topologyStore = useTopologyStore()
 
 const props = defineProps({
   gridEnabled: { type: Boolean, default: false }
@@ -14,35 +16,50 @@ const props = defineProps({
 // ref="graph"
 const graph = ref<Instance>()
 
+const nextVertexID = computed(() => topologyStore.vertices.length)
 const nodes: any = reactive({
-  // topology nodes
-  node1: { color: 'black' },
-  node2: { color: 'black' },
-  node3: { color: 'black' },
-  node4: { color: 'black' },
+  // topology nodes: vertex1: { color: 'black', isVertex: true, vertexIndex: 0 }
+  // fp nodes: fp1: { color: 'green', isFp: true }
+  // router nodes: router1: { color: 'red', isRouter: true }
 })
 
-const edges = reactive({
-  edge1: { source: "node1", target: "node2" },
-  edge2: { source: "node2", target: "node3" },
-  edge3: { source: "node3", target: "node4" },
-  edge4: { source: "node4", target: "node1" },
+const nextEdgeID = ref<number>(5)
+const edges: any = reactive({
 })
 
 const layouts: any = reactive({
   nodes: {
-    node1: { x: 0, y: 0 },
-    node2: { x: 50, y: 0 },
-    node3: { x: 50, y: 50 },
-    node4: { x: 0, y: 50 },
+    // node1: { x: 0, y: 0 },
   }
 })
 
 function updateGeometry() {
-  // clear all fp and router nodes
+  // clear all nodes
   for (let nodeName in nodes) {
-    if (nodes[nodeName].isFp || nodes[nodeName].isRouter) {
-      delete nodes[nodeName]
+    delete nodes[nodeName]
+  }
+
+  for (let edge in edges) {
+    delete edges[edge]
+  }
+
+  for (let vIndex in topologyStore.vertices) {
+    const v = topologyStore.vertices[vIndex]
+    nodes[`vertex${vIndex}`] = {
+      color: 'black',
+      isVertex: true,
+      vertexIndex: +vIndex,
+    }
+    layouts.nodes[`vertex${vIndex}`] = {
+      x: v.x,
+      y: v.y,
+    }
+  }
+
+  for (let v in topologyStore.vertices) {
+    edges[`edge${v}`] = {
+      source: `vertex${v}`,
+      target: `vertex${(+v as number + 1) % topologyStore.vertices.length}`,
     }
   }
 
@@ -56,7 +73,6 @@ function updateGeometry() {
     layouts.nodes[`fp${fpIndex}`] = {
       x: fp.position.x,
       y: fp.position.y,
-
     }
   }
 
@@ -165,6 +181,32 @@ watch(
 )
 
 const eventHandlers: EventHandlers = {
+  "node:dragend": (node) => {
+    for (let nodeName in node) {
+      if (nodes[nodeName].isVertex) {
+        topologyStore.moveVertexTo(nodes[nodeName].vertexIndex, node[nodeName].x, node[nodeName].y)
+      } else if (nodes[nodeName].isFp) {
+        fpStore.updatePos(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
+      } else if (nodes[nodeName].isRouter) {
+        routerStore.updatePos(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
+      }
+    }
+  },
+  // topology vertices creation / removing
+  "edge:click": ({ edge }) => {
+    if (edge !== undefined) {
+      const v1 = edges[edge].source
+      topologyStore.insertVertexAfter(nodes[v1].vertexIndex)
+      updateGeometry()
+    }
+  },
+  "node:click": ({ node }) => {
+    if (nodes[node].isVertex) {
+      topologyStore.removeVertex(nodes[node].vertexIndex)
+      updateGeometry()
+    }
+  },
+  // tooltip
   "node:pointerover": ({ node }) => {
     if (nodes[node].isFp || nodes[node].isRouter) {
       targetNodeId.value = node

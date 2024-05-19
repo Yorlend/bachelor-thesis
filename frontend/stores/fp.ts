@@ -174,4 +174,17 @@ export const useFpStore = defineStore({
       }
     ]
   }),
+  actions: {
+    addFp(name: string, x: number, y: number) {
+      this.fingerprints.push({name, position: { x, y } })
+    },
+    updatePos(name: string, x: number, y: number) {
+      for (let fp of this.fingerprints) {
+        if (fp.name === name) {
+          fp.position = { x, y }
+          break
+        }
+      }
+    }
+  },
 })

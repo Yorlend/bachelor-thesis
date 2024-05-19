@@ -27,4 +27,17 @@ export const useRoutersStore = defineStore({
       }
     ]
   }),
+  actions: {
+    addRouter(name: string, x: number, y: number) {
+      this.routers.push({name, position: { x, y } })
+    },
+    updatePos(name: string, x: number, y: number) {
+      for (let router of this.routers) {
+        if (router.name === name) {
+          router.position = { x, y }
+          break
+        }
+      }
+    }
+  },
 })

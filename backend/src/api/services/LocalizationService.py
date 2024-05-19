@@ -18,3 +18,6 @@ class LocalizationService:
 
     def fit(self):
         self.fpInteractor.fit()
+
+    def calculateRssi(self, pos: Point2D, rpos: list[Point2D]) -> list[float]:
+        pass
