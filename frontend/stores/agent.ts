@@ -3,7 +3,18 @@ import { defineStore } from 'pinia'
 export const useAgentStore = defineStore({
   id: 'agentStore',
   state: () => ({
-    x: 20.0,
-    y: 10.0
+    position: {x: NaN, y: NaN},
+    predicted: {x: NaN, y: NaN},
+    proximity: NaN
   }),
+  actions: {
+    updatePosition(x: number, y: number) {
+      this.position.x = x
+      this.position.y = y
+    },
+    updatePredicted(x: number, y: number) {
+      this.predicted.x = x
+      this.predicted.y = y
+    }
+  }
 })

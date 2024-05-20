@@ -17,7 +17,7 @@ class InMemoryRouterRepository(IRouterRepository):
         self.routers = routers
 
     def get(self) -> list[Router]:
-        return self.routers[:]
+        return self.routers
 
     def add(self, router: Router) -> None:
         self.routers.append(router)

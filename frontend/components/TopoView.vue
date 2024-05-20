@@ -8,6 +8,7 @@ import { useTopologyStore } from '@/stores/topology'
 const fpStore = useFpStore()
 const routerStore = useRoutersStore()
 const topologyStore = useTopologyStore()
+const agentStore = useAgentStore()
 
 const props = defineProps({
   gridEnabled: { type: Boolean, default: false }
@@ -88,10 +89,23 @@ async function updateGeometry() {
       y: router.position.y,
     }
   }
+
+  if (!isNaN(agentStore.position.x) && !isNaN(agentStore.position.y)) {
+    nodes[`agent`] = {
+      color: 'blue',
+      name: 'agent',
+      isAgent: true,
+    }
+    layouts.nodes[`agent`] = {
+      x: agentStore.position.x,
+      y: agentStore.position.y,
+    }
+  }
 }
 
 fpStore.$subscribe(updateGeometry)
 routerStore.$subscribe(updateGeometry)
+agentStore.$subscribe(updateGeometry)
 
 onMounted(async () => {
   await fpStore.get()
@@ -191,6 +205,8 @@ const eventHandlers: EventHandlers = {
         fpStore.update(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
       } else if (nodes[nodeName].isRouter) {
         routerStore.update(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
+      } else if (nodes[nodeName].isAgent) {
+        agentStore.updatePosition(node[nodeName].x, node[nodeName].y)
       }
     }
   },

@@ -12,4 +12,6 @@ LocalizationRouter = APIRouter(
 
 @LocalizationRouter.post("/")
 def localize(localizationService: Annotated[LocalizationService, Depends()], request: LocalizationRequest):
-    return localizationService.localize(request.getPosition(), request.topology)
+    pos, dist = localizationService.localize(
+        request.getPosition(), request.topology)
+    return {"x": pos.x, "y": pos.y, "distance": dist}
