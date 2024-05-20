@@ -12,7 +12,4 @@ LocalizationRouter = APIRouter(
 
 @LocalizationRouter.post("/")
 def localize(localizationService: Annotated[LocalizationService, Depends()], request: LocalizationRequest):
-    rssi = list[float]
-    # calculate rssi
-    localizationService.fit()
-    return localizationService.localize(rssi)
+    return localizationService.localize(request.getPosition(), request.topology)

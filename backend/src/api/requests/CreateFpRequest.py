@@ -11,4 +11,4 @@ class CreateFpRequest(BaseModel):
     rssi: list[int]
 
     def toFingerprint(self) -> FingerprintEntity:
-        return FingerprintEntity(self.name, Point2D(*self.position), self.rssi)
+        return FingerprintEntity(self.name, Point2D(self.position), self.rssi)

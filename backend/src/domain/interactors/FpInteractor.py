@@ -2,17 +2,25 @@
 import numpy as np
 from domain.entities.Fingerprint import FingerprintEntity
 from domain.entities.Point2D import Point2D
+from domain.entities.Polygon2D import Polygon2D
 from domain.methods.Method import Method
 from domain.repositories.FpRepository import IFpRepository
+
+from domain.optimizers.FpOptimizer import FpOptimizer
+from domain.repositories.RouterRepository import IRouterRepository
 
 
 class FpInteractor:
     fpRepository: IFpRepository
+    rRepository: IRouterRepository
     method: Method
+    optimizer: FpOptimizer
 
-    def __init__(self, fpRepository: IFpRepository, method: Method) -> None:
+    def __init__(self, fpRepository: IFpRepository, rRepository: IRouterRepository, method: Method, optimizer: FpOptimizer) -> None:
+        self.rRepository = rRepository
         self.fpRepository = fpRepository
         self.method = method
+        self.optimizer = optimizer
 
     def getFingerprints(self) -> list[FingerprintEntity]:
         return self.fpRepository.get()
@@ -34,6 +42,9 @@ class FpInteractor:
 
     def predict(self, rssi: list[float]) -> tuple[Point2D, float]:
         rssi = np.array(rssi)
-
         pos, dist = self.method.predict(rssi)
-        return Point2D(pos[0], pos[1]), dist
+        return Point2D(pos), dist
+
+    def optimize(self, topology: Polygon2D) -> list[Point2D]:
+        router_pos = [r.position for r in self.rRepository.get()]
+        return self.optimizer.optimize(self.method, topology, router_pos)
