@@ -1,43 +1,32 @@
 import { defineStore } from 'pinia'
+import { addRouter, deleteRouter, getRouters, updateRouter, type Router } from '@/lib/routers'
 
 export const useRoutersStore = defineStore({
   id: 'routersStore',
   state: () => ({
-    routers: [
-      {
-        name: 'router_0',
-        position: {
-          x: 10.0,
-          y: 40.0,
-        }
-      },
-      {
-        name: 'router_1',
-        position: {
-          x: 2.0,
-          y: 2.0,
-        }
-      },
-      {
-        name: 'router_2',
-        position: {
-          x: 9.0,
-          y: 4.0,
-        }
-      }
-    ]
+    routers: [] as Router[]
   }),
   actions: {
-    addRouter(name: string, x: number, y: number) {
+    async get(): Promise<Router[]> {
+      this.routers = await getRouters()
+      return this.routers
+    },
+    async add(name: string, x: number, y: number) {
+      await addRouter(name, x, y)
       this.routers.push({name, position: { x, y } })
     },
-    updatePos(name: string, x: number, y: number) {
-      for (let router of this.routers) {
+    async update(name: string, x: number, y: number) {
+      await updateRouter(name, x, y)
+      this.routers = this.routers.map((router) => {
         if (router.name === name) {
           router.position = { x, y }
-          break
         }
-      }
+        return router
+      })
+    },
+    async delete(name: string) {
+      await deleteRouter(name)
+      this.routers = this.routers.filter((router) => router.name !== name)
     }
   },
 })

@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from api.requests.CreateRouterRequest import CreateRouterRequest
+from api.requests.UpdateRouterRequest import UpdateRouterRequest
 from api.services.RouterService import RouterService
 
 
@@ -27,5 +28,5 @@ def remove(rService: Annotated[RouterService, Depends()], name: str):
 
 
 @APRouter.put("/{name}")
-def update(rService: Annotated[RouterService, Depends()], name: str, request: CreateRouterRequest):
-    rService.update(name, request.toRouter())
+def update(rService: Annotated[RouterService, Depends()], name: str, request: UpdateRouterRequest):
+    rService.update(name, request.toRouter(name))

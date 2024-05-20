@@ -1,5 +1,6 @@
-
 import numpy as np
+import cProfile
+
 from domain.entities.Fingerprint import FingerprintEntity
 from domain.entities.Point2D import Point2D
 from domain.entities.Polygon2D import Polygon2D
@@ -47,4 +48,10 @@ class FpInteractor:
 
     def optimize(self, topology: Polygon2D) -> list[Point2D]:
         router_pos = [r.position for r in self.rRepository.get()]
-        return self.optimizer.optimize(self.method, topology, router_pos)
+
+        with cProfile.Profile() as pr:
+            opt_res = self.optimizer.optimize(
+                self.method, topology, router_pos)
+            pr.dump_stats('profile.prof')
+
+        return opt_res

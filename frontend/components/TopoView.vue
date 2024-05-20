@@ -16,14 +16,12 @@ const props = defineProps({
 // ref="graph"
 const graph = ref<Instance>()
 
-const nextVertexID = computed(() => topologyStore.vertices.length)
 const nodes: any = reactive({
   // topology nodes: vertex1: { color: 'black', isVertex: true, vertexIndex: 0 }
   // fp nodes: fp1: { color: 'green', isFp: true }
   // router nodes: router1: { color: 'red', isRouter: true }
 })
 
-const nextEdgeID = ref<number>(5)
 const edges: any = reactive({
 })
 
@@ -33,7 +31,7 @@ const layouts: any = reactive({
   }
 })
 
-function updateGeometry() {
+async function updateGeometry() {
   // clear all nodes
   for (let nodeName in nodes) {
     delete nodes[nodeName]
@@ -63,8 +61,9 @@ function updateGeometry() {
     }
   }
 
-  for (let fpIndex in fpStore.fingerprints) {
-    const fp = fpStore.fingerprints[fpIndex]
+  const fingerprints = fpStore.fingerprints
+  for (let fpIndex in fingerprints) {
+    const fp = fingerprints[fpIndex]
     nodes[`fp${fpIndex}`] = {
       color: 'green',
       name: fp.name,
@@ -76,8 +75,9 @@ function updateGeometry() {
     }
   }
 
-  for (let routerIndex in routerStore.routers) {
-    const router = routerStore.routers[routerIndex]
+  const routers = routerStore.routers
+  for (let routerIndex in routers) {
+    const router = routers[routerIndex]
     nodes[`router${routerIndex}`] = {
       color: 'red',
       name: router.name,
@@ -93,7 +93,9 @@ function updateGeometry() {
 fpStore.$subscribe(updateGeometry)
 routerStore.$subscribe(updateGeometry)
 
-onMounted(() => {
+onMounted(async () => {
+  await fpStore.get()
+  await routerStore.get()
   updateGeometry()
 })
 
@@ -186,9 +188,9 @@ const eventHandlers: EventHandlers = {
       if (nodes[nodeName].isVertex) {
         topologyStore.moveVertexTo(nodes[nodeName].vertexIndex, node[nodeName].x, node[nodeName].y)
       } else if (nodes[nodeName].isFp) {
-        fpStore.updatePos(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
+        fpStore.update(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
       } else if (nodes[nodeName].isRouter) {
-        routerStore.updatePos(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
+        routerStore.update(nodes[nodeName].name, node[nodeName].x, node[nodeName].y)
       }
     }
   },
@@ -233,11 +235,6 @@ const zoomLevel = ref(4)
 </template>
 
 <style scoped>
-.graph {
-  width: 800px;
-  height: 600px;
-}
-
 .tooltip-wrapper {
   position: relative;
 }

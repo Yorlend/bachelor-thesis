@@ -16,8 +16,8 @@ from domain.optimizers.BoidsOptimizer import BoidsOptimizer
 class ServiceProvider:
     fpRepository: IFpRepository = InMemoryFpRepository()
     rRepository: IRouterRepository = InMemoryRouterRepository()
-    # method: Method = GradientMethod()
-    method: Method = WKNNMethod(k=5)
+    method: Method = GradientMethod()
+    # method: Method = WKNNMethod(k=5)
     optimizer: FpOptimizer = BoidsOptimizer()
     fpInteractor: FpInteractor = FpInteractor(
         fpRepository, rRepository, method, optimizer)

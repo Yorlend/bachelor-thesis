@@ -6,5 +6,9 @@ export default defineNuxtConfig({
   shadcn: {
     prefix: "S"
   },
-  modules: ["@nuxtjs/tailwindcss", "shadcn-nuxt", "@pinia/nuxt"]
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "shadcn-nuxt",
+    "@pinia/nuxt",
+  ],
 })

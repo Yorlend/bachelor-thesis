@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 
 from api.requests.CreateFpRequest import CreateFpRequest
 from api.requests.TopologyRequest import TopologyRequest
+from api.requests.UpdateFpRequest import UpdateFpRequest
 from api.services.FpStorageService import FpStorageService
 
 
@@ -23,8 +24,8 @@ def add(fpStorageService: Annotated[FpStorageService, Depends()], request: Creat
 
 
 @FpRouter.put("/{name}")
-def update(fpStorageService: Annotated[FpStorageService, Depends()], name: str, request: CreateFpRequest):
-    fpStorageService.updateFingerprint(name, request.toFingerprint())
+def update(fpStorageService: Annotated[FpStorageService, Depends()], name: str, request: UpdateFpRequest):
+    fpStorageService.updateFingerprint(name, request.toFingerprint(name))
 
 
 @FpRouter.delete("/{name}")

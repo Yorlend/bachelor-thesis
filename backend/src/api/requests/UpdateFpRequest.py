@@ -5,9 +5,8 @@ from domain.entities.Fingerprint import FingerprintEntity
 from domain.entities.Point2D import Point2D
 
 
-class CreateFpRequest(BaseModel):
-    name: str
+class UpdateFpRequest(BaseModel):
     position: tuple[float, float]
 
-    def toFingerprint(self) -> FingerprintEntity:
-        return FingerprintEntity(self.name, Point2D(self.position), [])
+    def toFingerprint(self, name: str) -> FingerprintEntity:
+        return FingerprintEntity(name, Point2D(self.position), [])

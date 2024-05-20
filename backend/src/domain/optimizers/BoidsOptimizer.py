@@ -71,7 +71,7 @@ class Boid:
         for edge in self.topology.edges():
             # check segments intersection
             u, v = Point2D.segments_intersection(p, new_p, *edge)
-            if 0 <= u <= 1 and 0 <= v <= 1:
+            if 0 < u <= 1 and 0 <= v <= 1:
                 int_p = p + (new_p - p) * u
                 n = (edge[1] - edge[0]).rotatedCCW90().normalized()
                 # new_p = new_p - n * 2 * n.dot(new_p - int_p)
@@ -100,9 +100,9 @@ class BoidsOptimizer(FpOptimizer):
     TEST_POINT_STEP = 1.0  # meters
     FP_COUNT = 10
     N_BOIDS = 50
-    N_ITERATIONS = 50
+    N_ITERATIONS = 10
     MAX_VELOCITY_PROJ = 2.0
-    DELTA_TIME = 0.1
+    DELTA_TIME = 2
     HISTORY_FILENAME_PREFIX = 'opt_history'
 
     def __init__(self):
@@ -128,11 +128,13 @@ class BoidsOptimizer(FpOptimizer):
                 if b.best_value < global_best_value:
                     global_best_value = b.best_value
                     global_best_state = b.best_state
-            phi_1 = 0.4 * self.__class__.DELTA_TIME
-            phi_2 = 0.6 * self.__class__.DELTA_TIME
+            phi_1 = 0.16 * self.__class__.DELTA_TIME
+            phi_2 = 0.24 * self.__class__.DELTA_TIME
             for b in boids:
                 # update velocities
-                b.update_velocity(phi_1, phi_2, global_best_state,
+                phi_1_rnd = phi_1 * np.random.rand()
+                phi_2_rnd = phi_2 * np.random.rand()
+                b.update_velocity(phi_1_rnd, phi_2_rnd, global_best_state,
                                   self.__class__.MAX_VELOCITY_PROJ)
                 # advance positions
                 b.advance(self.__class__.DELTA_TIME)
