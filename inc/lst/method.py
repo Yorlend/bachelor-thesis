@@ -32,25 +32,6 @@ class Model:
         self.distances = distances
         self.points_grad = np.array(self.points_grad)
     
-    def predict2(self, rssi: np.ndarray) -> tuple[np.ndarray, float]:
-        # выбираем ближайшие 3 опорные точки
-        ijk = np.argsort(self.test_points_rssi - rssi)[:2].flatten()
-
-        # вычисление изменений уровней сигналов от опорной точки по направлениям x y
-        pos_closest = self.test_points_pos[ijk]
-        offsets = []
-        for i in ijk:
-            P_B = self.points_grad[i].T
-            P = rssi - self.test_points_rssi[i]
-            offset = np.linalg.inv(P_B.T.dot(P_B)).dot(P_B.T).dot(P)
-            offsets.append(offset)
-
-        # вычисление координат по ближайшим опорным точкам
-        poses = pos_closest + offsets
-        pos = np.sum(poses, axis=0)
-
-        # определяем ближающую точку по координатам
-        return pos, 0
 
     def predict(self, rssi: np.ndarray) -> tuple[np.ndarray, float]:
         '''
