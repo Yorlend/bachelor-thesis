@@ -1,6 +1,6 @@
 <template>
   <div class="container flex flex-col justify-center items-stretch h-screen">
-    <TopoView class="border h-[800px] mr-5" :grid-enabled="false"></TopoView>
+    <TopoView class="border h-[800px]" :grid-enabled="false"></TopoView>
 
     <SButton class="my-5" @click="$router.push('/config')">К конфигурации</SButton>
 
