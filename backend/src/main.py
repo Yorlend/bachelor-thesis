@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers.APRouter import APRouter
 from api.routers.FpRouter import FpRouter
 from api.routers.LocalizationRouter import LocalizationRouter
+from api.routers.OptimizerRouter import OptRouter
 
 app = FastAPI()
 
@@ -18,3 +19,4 @@ app.add_middleware(
 app.include_router(FpRouter)
 app.include_router(LocalizationRouter)
 app.include_router(APRouter)
+app.include_router(OptRouter)

@@ -1,6 +1,7 @@
+import time
 import numpy as np
 
-from domain.optimizers.FpOptimizer import FpOptimizer
+from domain.optimizers.FpOptimizer import FpOptimizer, OptimizationStatus
 from domain.methods.Method import Method
 from domain.entities.Point2D import Point2D
 from domain.entities.Polygon2D import Polygon2D
@@ -97,12 +98,6 @@ class TravelHistory:
 
 
 class BoidsOptimizer(FpOptimizer):
-    TEST_POINT_STEP = 1.0  # meters
-    FP_COUNT = 10
-    N_BOIDS = 50
-    N_ITERATIONS = 10
-    MAX_VELOCITY_PROJ = 2.0
-    DELTA_TIME = 2
     HISTORY_FILENAME_PREFIX = 'opt_history'
 
     def __init__(self):
@@ -111,49 +106,117 @@ class BoidsOptimizer(FpOptimizer):
         self.topology = None
         self.routers = None
 
-    def optimize(self, method: Method, topology: Polygon2D, routers: list[Point2D]) -> list[Point2D]:
+        # optimizer parameters
+        self.n_iterations = 10
+        self.n_particles = 50
+        self.fp_count = 10
+        self.start_poses = None
+        self.max_velocity_proj = 2.0
+        self.delta_time = 2
+        self.test_point_step = 1.0  # meters
+
+        # optimization results
+        self.started = False
+        self.finished = False
+        self.progress = 0
+        self.canceled = False
+        self.result = None
+
+    def setParams(self, **kwargs):
+        if 'n_iterations' in kwargs:
+            self.n_iterations = kwargs['n_iterations']
+        if 'n_particles' in kwargs:
+            self.n_particles = kwargs['n_particles']
+        if 'fp_count' in kwargs:
+            self.fp_count = kwargs['fp_count']
+        if 'start_poses' in kwargs:
+            self.start_poses = kwargs['start_poses']
+        if 'max_velocity_proj' in kwargs:
+            self.max_velocity_proj = kwargs['max_velocity_proj']
+        if 'delta_time' in kwargs:
+            self.delta_time = kwargs['delta_time']
+        if 'test_point_step' in kwargs:
+            self.test_point_step = kwargs['test_point_step']
+
+    def optimize(self, method: Method, topology: Polygon2D, routers: list[Point2D]):
+        self.started = True
+        self.finished = False
+        self.canceled = False
+        self.progress = 0
+        self.result = None
         self.__initialize(method, topology, routers)
-        boids = [Boid.random_uniform(topology, self.__class__.FP_COUNT, self.__class__.MAX_VELOCITY_PROJ)
-                 for _ in range(self.__class__.N_BOIDS)]
+        boids = [Boid.random_uniform(topology, self.fp_count, self.max_velocity_proj)
+                 for _ in range(self.n_particles)]
+        # make use of initial positions
+        if self.start_poses is not None:
+            boids[0].fp_poses = self.start_poses
         # calculate initial values for positions
         for b in boids:
             b.evaluate(self.f)
         history = TravelHistory()
         history.commit(boids)
         # loop until enough
-        for iteration in range(self.__class__.N_ITERATIONS):
+        for iteration in range(self.n_iterations):
+            self.progress = iteration / self.n_iterations
+            print('progress:', self.progress)
+            if self.canceled:
+                break
             global_best_state = boids[0].best_state
             global_best_value = boids[0].best_value
             for b in boids:
                 if b.best_value < global_best_value:
                     global_best_value = b.best_value
                     global_best_state = b.best_state
-            phi_1 = 0.16 * self.__class__.DELTA_TIME
-            phi_2 = 0.24 * self.__class__.DELTA_TIME
-            for b in boids:
+            phi_1 = 0.16 * self.delta_time
+            phi_2 = 0.24 * self.delta_time
+            for num, b in enumerate(boids):
+                self.progress = (
+                    iteration + num / self.n_particles) / self.n_iterations
+                if self.canceled:
+                    break
                 # update velocities
                 phi_1_rnd = phi_1 * np.random.rand()
                 phi_2_rnd = phi_2 * np.random.rand()
                 b.update_velocity(phi_1_rnd, phi_2_rnd, global_best_state,
-                                  self.__class__.MAX_VELOCITY_PROJ)
+                                  self.max_velocity_proj)
+                if self.canceled:
+                    break
                 # advance positions
-                b.advance(self.__class__.DELTA_TIME)
+                b.advance(self.delta_time)
+                if self.canceled:
+                    break
                 # update values
                 b.evaluate(self.f)
             history.commit(boids)
             print('iteration', iteration, 'best value', global_best_value)
         history.dump(self.__class__.HISTORY_FILENAME_PREFIX)
-        return global_best_state
+        self.result = None if self.canceled else global_best_state
+        self.finished = True
+        return self.result
+
+    def cancel(self):
+        if self.started:
+            self.canceled = True
+            while not self.finished:
+                time.sleep(0.01)
+
+    def status(self) -> OptimizationStatus:
+        if self.canceled:
+            return OptimizationStatus(status='canceled', progress=self.progress)
+        if self.result is not None:
+            return OptimizationStatus(status='done', progress=self.progress)
+        if not self.started:
+            return OptimizationStatus(status='not_started', progress=self.progress)
+        return OptimizationStatus(status='running', progress=self.progress)
 
     def __initialize(self, method: Method, topology: Polygon2D, routers: list[Point2D]):
         self.method = method
         self.topology = topology
         self.routers = routers
-        self.test_points = BoidsOptimizer.__extract_test_points(topology)
+        self.test_points = self.__extract_test_points(topology)
 
-    @classmethod
-    def __extract_test_points(cls, topology: Polygon2D) -> list[Point2D]:
-        half_step = cls.TEST_POINT_STEP / 2
+    def __extract_test_points(self, topology: Polygon2D) -> list[Point2D]:
+        half_step = self.test_point_step / 2
         half_step_vec = Point2D(half_step, half_step)
 
         top_left = topology.topLeft() + half_step_vec
@@ -161,8 +224,8 @@ class BoidsOptimizer(FpOptimizer):
         delta = bottom_right - top_left
 
         # TODO: may not work for really small topologies
-        x_steps = round(delta.x / cls.TEST_POINT_STEP)
-        y_steps = round(delta.y / cls.TEST_POINT_STEP)
+        x_steps = round(delta.x / self.test_point_step)
+        y_steps = round(delta.y / self.test_point_step)
 
         test_points = []
         for y in np.linspace(top_left.y, bottom_right.y, y_steps):

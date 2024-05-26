@@ -1,4 +1,6 @@
 
+from data.repositories.FileRouterRepository import FileRouterRepository
+from data.repositories.FileFpRepository import FileFpRepository
 from data.repositories.InMemoryFpRepository import InMemoryFpRepository
 from data.repositories.InMemoryRouterRepository import InMemoryRouterRepository
 from domain.interactors.FpInteractor import FpInteractor
@@ -7,6 +9,7 @@ from domain.methods.Gradient import GradientMethod
 from domain.methods.KNN import KNNMethod
 from domain.methods.Method import Method
 from domain.methods.WKNN import WKNNMethod
+from domain.optimizers.AsyncWrapper import AsyncOptimizerWrapper
 from domain.repositories.FpRepository import IFpRepository
 from domain.repositories.RouterRepository import IRouterRepository
 from domain.optimizers.FpOptimizer import FpOptimizer
@@ -14,8 +17,12 @@ from domain.optimizers.BoidsOptimizer import BoidsOptimizer
 
 
 class ServiceProvider:
-    fpRepository: IFpRepository = InMemoryFpRepository()
-    rRepository: IRouterRepository = InMemoryRouterRepository()
+    # fpRepository: IFpRepository = InMemoryFpRepository()
+    fpRepository: IFpRepository = FileFpRepository('db/data/fingerprints.pkl')
+    # rRepository: IRouterRepository = InMemoryRouterRepository()
+    rRepository: IRouterRepository = FileRouterRepository(
+        'db/data/routers.pkl')
+
     method: Method = GradientMethod()
     # method: Method = WKNNMethod(k=5)
     optimizer: FpOptimizer = BoidsOptimizer()

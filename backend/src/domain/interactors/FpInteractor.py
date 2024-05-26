@@ -7,7 +7,7 @@ from domain.entities.Polygon2D import Polygon2D
 from domain.methods.Method import Method
 from domain.repositories.FpRepository import IFpRepository
 
-from domain.optimizers.FpOptimizer import FpOptimizer
+from domain.optimizers.FpOptimizer import FpOptimizer, OptimizationStatus
 from domain.repositories.RouterRepository import IRouterRepository
 
 
@@ -46,12 +46,30 @@ class FpInteractor:
         pos, dist = self.method.predict(rssi)
         return Point2D(pos), dist
 
-    def optimize(self, topology: Polygon2D) -> list[Point2D]:
-        router_pos = [r.position for r in self.rRepository.get()]
+    def setOptimizerParams(self, **kwargs):
+        self.optimizer.setParams(**kwargs)
 
+    def startOptimization(self, topology: Polygon2D) -> list[Point2D]:
+        router_pos = [r.position for r in self.rRepository.get()]
+        fp_poses = [Point2D(f.position.x, f.position.y)
+                    for f in self.getFingerprints()]
+        self.optimizer.setParams(
+            fp_count=len(self.getFingerprints()),
+            start_poses=fp_poses,
+        )
         with cProfile.Profile() as pr:
             opt_res = self.optimizer.optimize(
                 self.method, topology, router_pos)
-            pr.dump_stats('profile.prof')
+            if opt_res is not None:
+                pr.dump_stats('profile.prof')
+                # update fingerprint positions
+                for i in range(len(opt_res)):
+                    self.updateFingerprint(
+                        self.getFingerprints()[i].name, FingerprintEntity(
+                            self.getFingerprints()[i].name, opt_res[i], self.getFingerprints()[i].rssi))
 
-        return opt_res
+    def cancelOptimization(self):
+        self.optimizer.cancel()
+
+    def getOptimizationStatus(self) -> OptimizationStatus:
+        return self.optimizer.status()

@@ -3,7 +3,6 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from api.requests.CreateFpRequest import CreateFpRequest
-from api.requests.TopologyRequest import TopologyRequest
 from api.requests.UpdateFpRequest import UpdateFpRequest
 from api.services.FpStorageService import FpStorageService
 
@@ -31,8 +30,3 @@ def update(fpStorageService: Annotated[FpStorageService, Depends()], name: str, 
 @FpRouter.delete("/{name}")
 def remove(fpStorageService: Annotated[FpStorageService, Depends()], name: str):
     fpStorageService.removeFingerprint(name)
-
-
-@FpRouter.post("/optimize")
-def optimize(fpStorageService: Annotated[FpStorageService, Depends()], request: TopologyRequest):
-    return fpStorageService.optimize(request.toPolygon2D())
