@@ -38,7 +38,7 @@ class InMemoryFpRepository(IFpRepository):
         self.fingerprints = fingerprints
 
     def get(self) -> list[FingerprintEntity]:
-        return self.fingerprints[:]
+        return self.fingerprints
 
     def add(self, fingerprint: FingerprintEntity) -> None:
         self.fingerprints.append(fingerprint)
