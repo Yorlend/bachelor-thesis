@@ -1,3 +1,4 @@
+from typing import Self
 import numpy as np
 
 from numpy import ndarray
@@ -27,3 +28,6 @@ class KNNMethod(Method):
         # вычисление координат по опорным точкам
         pos = np.sum(self.fp_pos[sorted_ids], axis=0) / self.k
         return pos, np.linalg.norm(pos - self.fp_pos[sorted_ids[0]])
+
+    def clone(self) -> Self:
+        return KNNMethod(k=self.k)

@@ -1,5 +1,8 @@
+from threading import Thread
 import time
 import numpy as np
+
+from concurrent.futures import ThreadPoolExecutor
 
 from domain.optimizers.FpOptimizer import FpOptimizer, OptimizationStatus
 from domain.methods.Method import Method
@@ -236,15 +239,18 @@ class BoidsOptimizer(FpOptimizer):
         return test_points
 
     def f(self, fp_poses: list[Point2D]) -> float:
+        return self.f_threaded(fp_poses, self.method)
+
+    def f_threaded(self, fp_poses: list[Point2D], method: Method) -> float:
         fp_pos = np.array([(f.x, f.y) for f in fp_poses])
         rssi = np.array([Simulator.calculateRssiVector(
             self.routers, p, self.topology) for p in fp_poses])
-        self.method.fit(fp_pos, rssi)
+        method.fit(fp_pos, rssi)
         err = 0
         for p in self.test_points:
             rssi = Simulator.calculateRssiVector(
                 self.routers, p, self.topology)
-            prediction, _ = self.method.predict(rssi)
+            prediction, _ = method.predict(rssi)
             err_vec = Point2D(prediction) - p
             err += np.hypot(err_vec.x, err_vec.y)
         err /= len(self.test_points)

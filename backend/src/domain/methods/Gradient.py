@@ -1,4 +1,5 @@
 import itertools
+from typing import Self
 import numpy as np
 
 from numpy import ndarray
@@ -58,6 +59,9 @@ class GradientMethod(Method):
         # вычисление координат по ближайшей опорной точке
         pos = pos_closest + offset
         return pos, np.linalg.norm(pos - pos_closest)
+
+    def clone(self) -> Self:
+        return GradientMethod()
 
     def _compute_rssi_grad(self, i: int, distances: ndarray) -> ndarray:
         closest_idx = np.argsort(distances[i])

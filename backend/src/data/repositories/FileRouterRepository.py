@@ -11,6 +11,7 @@ class FileRouterRepository(IRouterRepository):
         if path.exists(filename):
             with open(filename, 'rb') as f:
                 self.routers = pickle.load(f)
+                print(self.routers)
         else:
             self.routers = []
 

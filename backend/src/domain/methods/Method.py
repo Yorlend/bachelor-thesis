@@ -1,5 +1,6 @@
 
 from abc import ABC, abstractmethod
+from typing import Self
 
 from numpy import ndarray
 
@@ -12,4 +13,8 @@ class Method(ABC):
 
     @abstractmethod
     def predict(self, rssi: ndarray) -> tuple[ndarray, float]:
+        pass
+
+    @abstractmethod
+    def clone(self) -> Self:
         pass

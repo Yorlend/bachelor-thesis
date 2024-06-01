@@ -1,3 +1,4 @@
+from typing import Self
 import numpy as np
 
 from numpy import ndarray
@@ -30,3 +31,6 @@ class WKNNMethod(Method):
         pos = np.sum(self.fp_pos[sorted_ids] *
                      np.array([weights, weights]).T, axis=0)
         return pos, np.linalg.norm(pos - self.fp_pos[sorted_ids[0]])
+
+    def clone(self) -> Self:
+        return WKNNMethod(k=self.k)

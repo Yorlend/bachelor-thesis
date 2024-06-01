@@ -11,6 +11,7 @@ class FileFpRepository(IFpRepository):
         if path.exists(filename):
             with open(filename, 'rb') as f:
                 self.fingerprints = pickle.load(f)
+                print(self.fingerprints)
         else:
             self.fingerprints = []
 

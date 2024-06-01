@@ -1,0 +1,39 @@
+\usepackage{makecell}
+\usepackage{rotating}
+
+% gothic math font
+\usepackage{yfonts}
+
+% vertical centering images in tables
+\usepackage{cellspace}
+\setlength\cellspacetoplimit{4pt}
+\setlength\cellspacebottomlimit{4pt}
+\newcommand\cincludegraphics[2][]{\raisebox{-0.3\height}{\includegraphics[#1]{#2}}}
+
+% Создание страницы определений
+\renewenvironment{definitions}
+{
+	\chapter*{ОПРЕДЕЛЕНИЯ}
+	\addcontentsline{toc}{chapter}{ОПРЕДЕЛЕНИЯ}
+	
+	В настоящей расчетно-пояснительной записке используются следующие термины.
+	
+	\begin{description}[leftmargin=0pt]
+	}
+	{
+	\end{description}
+}
+
+% Создание страницы обозначений и сокращений
+\renewenvironment{abbreviations}
+{
+	\chapter*{ОБОЗНАЧЕНИЯ И СОКРАЩЕНИЯ}
+	\addcontentsline{toc}{chapter}{ОБОЗНАЧЕНИЯ И СОКРАЩЕНИЯ}
+	
+	В настоящей расчетно-пояснительной записке используются следующие сокращения и обозначения.
+	
+	\begin{description}[leftmargin=0pt]
+	}
+	{
+	\end{description}
+}

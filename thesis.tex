@@ -1,4 +1,26 @@
-\documentclass{bmstu}
+\documentclass{bmstu/bmstu}
+
+\include{preambule}
+
+\usepackage{tocloft}
+
+\setlength{\cftbeforetoctitleskip}{0pt}
+\renewcommand{\contentsname}{СОДЕРЖАНИЕ}
+\renewcommand{\cfttoctitlefont}{\hfill\normalsize\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill\mbox{}}
+
+
+% Remove padding for TOC entries
+\renewcommand{\cftsecindent}{0em}
+\renewcommand{\cftsubsecindent}{0em}
+\renewcommand{\cftsubsubsecindent}{0em}
+
+% Customizing TOC entries font and alignment
+\renewcommand{\cftsecfont}{\normalsize}
+\renewcommand{\cftsubsecfont}{\normalsize}
+\renewcommand{\cftsubsubsecfont}{\normalsize}
+
+\setlength{\cftbeforetoctitleskip}{-20pt}
 
 \bibliography{biblio}
 
@@ -11,7 +33,7 @@
     {Корниенко~К.~Ю./ИУ7-81Б} % Номер группы/ФИО студента (если авторов несколько, их необходимо разделить запятой)
     {Кудрявцев~М.~А.} % ФИО научного руководителя
     {} % ФИО консультанта (необязательный аргумент; если консультантов несколько, их необходимо разделить запятой)
-    {} % ФИО нормоконтролера
+    {\textcolor{white}{Мальцева~Д.~Ю.}} % ФИО нормоконтролера
 
 \setcounter{page}{5}
 \include{00-essay}
