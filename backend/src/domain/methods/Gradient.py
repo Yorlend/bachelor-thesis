@@ -39,7 +39,7 @@ class GradientMethod(Method):
         self.distances = distances
         self.points_grad = np.array(self.points_grad)
 
-    def predict(self, rssi: ndarray) -> tuple[ndarray, float]:
+    def predict(self, rssi: ndarray) -> tuple[ndarray, ndarray]:
         '''
         Функция предсказания позиции агента по уровням сигналов RSSI
 
@@ -58,7 +58,7 @@ class GradientMethod(Method):
 
         # вычисление координат по ближайшей опорной точке
         pos = pos_closest + offset
-        return pos, np.linalg.norm(pos - pos_closest)
+        return pos, pos_closest
 
     def clone(self) -> Self:
         return GradientMethod()

@@ -1,3 +1,4 @@
+            self.points_grad.append(grad)
         self.distances = distances
         self.points_grad = np.array(self.points_grad)
 

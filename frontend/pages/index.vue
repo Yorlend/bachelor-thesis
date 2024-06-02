@@ -21,8 +21,9 @@
           <span>Предсказанная позиция:</span>
           <span>{{ Math.round(agentStore.predicted.x * 100) / 100 }}, {{ Math.round(agentStore.predicted.y * 100) / 100
             }}</span>
-          <span>Расстояние до ближайшей опорной точки: </span>
-          <span>{{ Math.round(agentStore.proximity * 100) / 100 }}</span>
+          <span>Координаты ближайшей опорной точки: </span>
+          <span>{{ Math.round(agentStore.closest.x * 100) / 100 }}, {{ Math.round(agentStore.closest.y * 100) / 100
+            }}</span>
         </div>
       </div>
     </div>
@@ -44,7 +45,8 @@ const onLocalize = async () => {
   if (res) {
     agentStore.predicted.x = res.x
     agentStore.predicted.y = res.y
-    agentStore.proximity = res.distance
+    agentStore.closest.x = res.closest_x
+    agentStore.closest.y = res.closest_y
   }
 }
 

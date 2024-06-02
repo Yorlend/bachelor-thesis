@@ -1,23 +1,27 @@
 export type LocalizationResponse = {
-    x: number
-    y: number
-    distance: number
-}
+  x: number;
+  y: number;
+  closest_x: number;
+  closest_y: number;
+};
 
-export async function localize(x: number, y: number): Promise<LocalizationResponse> {
-    const response = await fetch('http://localhost:8000/locate/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            x: x,
-            y: y,
-            topology: {
-                vertices: []
-            }
-        }),
-    }) 
+export async function localize(
+  x: number,
+  y: number
+): Promise<LocalizationResponse> {
+  const response = await fetch("http://localhost:8000/locate/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      x: x,
+      y: y,
+      topology: {
+        vertices: [],
+      },
+    }),
+  });
 
-    return await response.json()
+  return await response.json();
 }

@@ -20,7 +20,7 @@ class LocalizationService:
         self.fpInteractor = fpInteractor
         self.rInteractor = rInteractor
 
-    def localize(self, position: Point2D, topology: Polygon2D) -> tuple[Point2D, float]:
+    def localize(self, position: Point2D, topology: Polygon2D) -> tuple[Point2D, Point2D]:
         rssi_vec = Simulator.calculateRssiVector(
             [r.position for r in self.rInteractor.get()], position, topology)
         fps = self.fpInteractor.getFingerprints()

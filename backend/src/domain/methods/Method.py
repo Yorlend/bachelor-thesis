@@ -12,7 +12,7 @@ class Method(ABC):
         pass
 
     @abstractmethod
-    def predict(self, rssi: ndarray) -> tuple[ndarray, float]:
+    def predict(self, rssi: ndarray) -> tuple[ndarray, ndarray]:
         pass
 
     @abstractmethod

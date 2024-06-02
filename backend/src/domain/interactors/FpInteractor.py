@@ -41,10 +41,10 @@ class FpInteractor:
         rssi = np.array([f.rssi for f in self.getFingerprints()])
         self.method.fit(fp_pos, rssi)
 
-    def predict(self, rssi: list[float]) -> tuple[Point2D, float]:
+    def predict(self, rssi: list[float]) -> tuple[Point2D, Point2D]:
         rssi = np.array(rssi)
-        pos, dist = self.method.predict(rssi)
-        return Point2D(pos), dist
+        pos, closest = self.method.predict(rssi)
+        return Point2D(pos), Point2D(closest)
 
     def setOptimizerParams(self, **kwargs):
         self.optimizer.setParams(**kwargs)

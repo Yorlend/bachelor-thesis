@@ -30,4 +30,3 @@ class Model:
         for i in range(self.test_points_count):
             # Вычислить градиент в точке i
             grad = self._compute_rssi_grad(i, distances)
-            self.points_grad.append(grad)

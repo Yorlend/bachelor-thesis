@@ -1,20 +1,20 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 export const useAgentStore = defineStore({
-  id: 'agentStore',
+  id: "agentStore",
   state: () => ({
-    position: {x: NaN, y: NaN},
-    predicted: {x: NaN, y: NaN},
-    proximity: NaN
+    position: { x: NaN, y: NaN },
+    predicted: { x: NaN, y: NaN },
+    closest: { x: NaN, y: NaN },
   }),
   actions: {
     updatePosition(x: number, y: number) {
-      this.position.x = x
-      this.position.y = y
+      this.position.x = x;
+      this.position.y = y;
     },
     updatePredicted(x: number, y: number) {
-      this.predicted.x = x
-      this.predicted.y = y
-    }
-  }
-})
+      this.predicted.x = x;
+      this.predicted.y = y;
+    },
+  },
+});

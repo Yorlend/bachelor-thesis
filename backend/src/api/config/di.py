@@ -23,9 +23,9 @@ class ServiceProvider:
     rRepository: IRouterRepository = FileRouterRepository(
         'db/data/routers.pkl')
 
-    # method: Method = GradientMethod()
+    method: Method = GradientMethod()
     # method: Method = KNNMethod(k=4)
-    method: Method = WKNNMethod(k=4)
+    # method: Method = WKNNMethod(k=4)
     optimizer: FpOptimizer = BoidsOptimizer()
     fpInteractor: FpInteractor = FpInteractor(
         fpRepository, rRepository, method, optimizer)
